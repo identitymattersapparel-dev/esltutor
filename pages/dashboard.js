@@ -12,6 +12,26 @@ export default function Dashboard() {
   const [saveStatus, setSaveStatus] = useState('')
   const [logoutStatus, setLogoutStatus] = useState('')
 
+  const loadProfile = async (userId) => {
+    const { data: profileData, error: profileError } = await supabase
+      .schema('esl_tutor')
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (profileError) {
+      setStatus(`Profile error: ${profileError.message}`)
+      return null
+    }
+
+    setProfile(profileData)
+    setLevel(profileData.current_level || '')
+    setChapter(profileData.current_chapter || '')
+    setStatus('')
+    return profileData
+  }
+
   useEffect(() => {
     const loadDashboard = async () => {
       const {
@@ -25,23 +45,7 @@ export default function Dashboard() {
       }
 
       setUser(user)
-
-      const { data: profileData, error: profileError } = await supabase
-        .schema('esl_tutor')
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-
-      if (profileError) {
-        setStatus(`Profile error: ${profileError.message}`)
-        return
-      }
-
-      setProfile(profileData)
-      setLevel(profileData.current_level || '')
-      setChapter(profileData.current_chapter || '')
-      setStatus('')
+      await loadProfile(user.id)
     }
 
     loadDashboard()
@@ -52,7 +56,7 @@ export default function Dashboard() {
 
     setSaveStatus('Saving...')
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .schema('esl_tutor')
       .from('profiles')
       .update({
@@ -61,15 +65,13 @@ export default function Dashboard() {
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id)
-      .select()
-      .single()
 
     if (error) {
       setSaveStatus(`Error: ${error.message}`)
       return
     }
 
-    setProfile(data)
+    await loadProfile(user.id)
     setSaveStatus('Saved successfully.')
   }
 
