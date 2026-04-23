@@ -1,0 +1,150 @@
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
+import { supabase } from '../lib/supabaseClient'
+
+export default function Practice() {
+  const router = useRouter()
+  const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [status, setStatus] = useState('Loading...')
+
+  useEffect(() => {
+    const init = async () => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser()
+
+      if (userError || !user) {
+        router.replace('/login')
+        return
+      }
+
+      setUser(user)
+
+      const { data: profileData, error: profileError } = await supabase
+        .schema('esl_tutor')
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError) {
+        setStatus(`Profile error: ${profileError.message}`)
+        return
+      }
+
+      setProfile(profileData)
+      setStatus('')
+    }
+
+    init()
+  }, [router])
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return
+
+    const messageToSend = input
+
+    const userMessage = { role: 'user', content: messageToSend }
+    setMessages((prev) => [...prev, userMessage])
+    setInput('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: messageToSend,
+          level: profile?.current_level,
+          chapter: profile?.current_chapter,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: `Error: ${data.error || 'Something went wrong'}` },
+        ])
+        setLoading(false)
+        return
+      }
+
+      const aiMessage = { role: 'assistant', content: data.reply }
+      setMessages((prev) => [...prev, aiMessage])
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: `Error: ${error.message}` },
+      ])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleKeyDown = async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      await sendMessage()
+    }
+  }
+
+  return (
+    <div style={{ maxWidth: 700, margin: '50px auto', padding: '0 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h2>Practice Conversation</h2>
+        <Link href="/dashboard">Back to Dashboard</Link>
+      </div>
+
+      {status && <p>{status}</p>}
+
+      {user && profile && (
+        <div style={{ marginBottom: 20 }}>
+          <p><strong>Student:</strong> {profile.full_name || user.email}</p>
+          <p><strong>Level:</strong> {profile.current_level || '(not set)'}</p>
+          <p><strong>Chapter:</strong> {profile.current_chapter || '(not set)'}</p>
+        </div>
+      )}
+
+      <div
+        style={{
+          border: '1px solid #ccc',
+          padding: 16,
+          minHeight: 320,
+          marginBottom: 16,
+          background: '#fff',
+        }}
+      >
+        {messages.length === 0 ? (
+          <p>Start the conversation.</p>
+        ) : (
+          messages.map((m, i) => (
+            <div key={i} style={{ marginBottom: 12 }}>
+              <strong>{m.role === 'user' ? 'You' : 'Tutor'}:</strong> {m.content}
+            </div>
+          ))
+        )}
+      </div>
+
+      <div style={{ display: 'flex', gap: 10 }}>
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          style={{ flex: 1, padding: 10 }}
+          placeholder="Type your message..."
+        />
+        <button onClick={sendMessage} disabled={loading || !input.trim()} style={{ padding: '10px 20px' }}>
+          {loading ? 'Sending...' : 'Send'}
+        </button>
+      </div>
+    </div>
+  )
+}

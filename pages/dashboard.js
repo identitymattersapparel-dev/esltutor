@@ -149,6 +149,10 @@ export default function Dashboard() {
                 Save Progress
               </button>
 
+              <button onClick={() => router.push('/practice')} style={{ padding: '10px 20px' }}>
+                Start Practice
+              </button>
+
               <button onClick={handleLogout} style={{ padding: '10px 20px' }}>
                 Logout
               </button>
