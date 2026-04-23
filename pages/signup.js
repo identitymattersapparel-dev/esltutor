@@ -6,24 +6,33 @@ export default function Signup() {
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [status, setStatus] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSignup = async () => {
+  const handleSignup = async (e) => {
+    e.preventDefault()
+    setLoading(true)
     setStatus('Signing up...')
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
         }
-      }
-    })
+      })
 
-    if (error) {
-      setStatus(error.message)
-    } else {
-      setStatus('Signup successful! Check your email.')
+      if (error) {
+        setStatus(`Error: ${error.message}`)
+      } else {
+        setStatus(`Signup successful. User id: ${data?.user?.id || 'created'}`)
+      }
+    } catch (err) {
+      setStatus(`Unexpected error: ${err.message}`)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -31,34 +40,42 @@ export default function Signup() {
     <div style={{ maxWidth: 400, margin: '100px auto', textAlign: 'center' }}>
       <h1>Sign Up</h1>
 
-      <input
-        placeholder="Full Name"
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-        style={{ width: '100%', padding: 10, marginBottom: 10 }}
-      />
+      <form onSubmit={handleSignup}>
+        <input
+          placeholder="Full Name"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          style={{ width: '100%', padding: 10, marginBottom: 10 }}
+        />
 
-      <input
-        placeholder="Email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{ width: '100%', padding: 10, marginBottom: 10 }}
-      />
+        <input
+          placeholder="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ width: '100%', padding: 10, marginBottom: 10 }}
+          required
+        />
 
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ width: '100%', padding: 10, marginBottom: 10 }}
-      />
+        <input
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ width: '100%', padding: 10, marginBottom: 10 }}
+          required
+        />
 
-      <button onClick={handleSignup} style={{ width: '100%', padding: 10 }}>
-        Sign Up
-      </button>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{ width: '100%', padding: 10 }}
+        >
+          {loading ? 'Signing Up...' : 'Sign Up'}
+        </button>
+      </form>
 
-      <p>{status}</p>
+      <p style={{ marginTop: 16 }}>{status}</p>
     </div>
   )
 }
