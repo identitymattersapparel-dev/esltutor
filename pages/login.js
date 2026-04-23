@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Login() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState('')
@@ -19,11 +21,11 @@ export default function Login() {
 
     if (error) {
       setStatus(`Error: ${error.message}`)
-    } else {
-      setStatus('Login successful.')
+      setLoading(false)
+      return
     }
 
-    setLoading(false)
+    router.push('/dashboard')
   }
 
   return (
