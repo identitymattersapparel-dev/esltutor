@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -7,7 +8,23 @@ export default function Signup() {
   const [status, setStatus] = useState('')
 
   const handleSignup = async () => {
-    setStatus('Signup not wired yet')
+    setStatus('Signing up...')
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName
+        }
+      }
+    })
+
+    if (error) {
+      setStatus(error.message)
+    } else {
+      setStatus('Signup successful! Check your email.')
+    }
   }
 
   return (
@@ -23,6 +40,7 @@ export default function Signup() {
 
       <input
         placeholder="Email"
+        type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         style={{ width: '100%', padding: 10, marginBottom: 10 }}
