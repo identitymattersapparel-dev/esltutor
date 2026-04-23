@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Login() {
@@ -8,6 +9,20 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (user) {
+        router.replace('/dashboard')
+      }
+    }
+
+    checkUser()
+  }, [router])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -61,6 +76,9 @@ export default function Login() {
       </form>
 
       <p style={{ marginTop: 16 }}>{status}</p>
+      <p style={{ marginTop: 16 }}>
+        Need an account? <Link href="/signup">Sign Up</Link>
+      </p>
     </div>
   )
 }

@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Dashboard() {
+  const router = useRouter()
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [level, setLevel] = useState('')
   const [chapter, setChapter] = useState('')
   const [status, setStatus] = useState('Loading...')
   const [saveStatus, setSaveStatus] = useState('')
+  const [logoutStatus, setLogoutStatus] = useState('')
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -17,7 +20,7 @@ export default function Dashboard() {
       } = await supabase.auth.getUser()
 
       if (userError || !user) {
-        setStatus('No user logged in.')
+        router.replace('/login')
         return
       }
 
@@ -42,7 +45,7 @@ export default function Dashboard() {
     }
 
     loadDashboard()
-  }, [])
+  }, [router])
 
   const handleSave = async () => {
     if (!user) return
@@ -68,6 +71,19 @@ export default function Dashboard() {
 
     setProfile(data)
     setSaveStatus('Saved successfully.')
+  }
+
+  const handleLogout = async () => {
+    setLogoutStatus('Logging out...')
+
+    const { error } = await supabase.auth.signOut()
+
+    if (error) {
+      setLogoutStatus(`Error: ${error.message}`)
+      return
+    }
+
+    router.push('/login')
   }
 
   return (
@@ -126,11 +142,18 @@ export default function Dashboard() {
               </select>
             </div>
 
-            <button onClick={handleSave} style={{ padding: '10px 20px' }}>
-              Save Progress
-            </button>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
+              <button onClick={handleSave} style={{ padding: '10px 20px' }}>
+                Save Progress
+              </button>
+
+              <button onClick={handleLogout} style={{ padding: '10px 20px' }}>
+                Logout
+              </button>
+            </div>
 
             {saveStatus && <p style={{ marginTop: 12 }}>{saveStatus}</p>}
+            {logoutStatus && <p style={{ marginTop: 12 }}>{logoutStatus}</p>}
           </div>
 
           <div style={{ marginTop: 24 }}>

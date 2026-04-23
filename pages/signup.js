@@ -1,12 +1,29 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Signup() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (user) {
+        router.replace('/dashboard')
+      }
+    }
+
+    checkUser()
+  }, [router])
 
   const handleSignup = async (e) => {
     e.preventDefault()
@@ -14,21 +31,24 @@ export default function Signup() {
     setStatus('Signing up...')
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            full_name: fullName
-          }
-        }
+            full_name: fullName,
+          },
+        },
       })
 
       if (error) {
         setStatus(`Error: ${error.message}`)
-      } else {
-        setStatus(`Signup successful. User id: ${data?.user?.id || 'created'}`)
+        setLoading(false)
+        return
       }
+
+      setStatus('Signup successful. Redirecting to dashboard...')
+      router.push('/dashboard')
     } catch (err) {
       setStatus(`Unexpected error: ${err.message}`)
     } finally {
@@ -76,6 +96,9 @@ export default function Signup() {
       </form>
 
       <p style={{ marginTop: 16 }}>{status}</p>
+      <p style={{ marginTop: 16 }}>
+        Already have an account? <Link href="/login">Login</Link>
+      </p>
     </div>
   )
 }
