@@ -10,7 +10,7 @@ export default function Practice() {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [status, setStatus] = useState('Loading...')
+  const [status, setStatus] = useState('Loading practice...')
   const [sessionId, setSessionId] = useState(null)
 
   useEffect(() => {
@@ -35,41 +35,36 @@ export default function Practice() {
         .single()
 
       if (profileError || !profileData) {
-        setStatus(`Profile error: ${profileError?.message || 'Profile not found'}`)
+        setStatus(`Profile error: ${profileError?.message || 'Profile not found.'}`)
         return
       }
 
       setProfile(profileData)
 
-      const savedLevel = profileData.current_level || ''
-      const savedChapter = profileData.current_chapter || ''
-
-      if (!savedLevel || !savedChapter) {
-        setStatus('Please go back to the dashboard and save a level and chapter before starting practice.')
+      if (!profileData.current_level || !profileData.current_chapter) {
+        setStatus('Please go back to the dashboard and save both a level and chapter before starting practice.')
         return
       }
 
       const welcomeMessage = {
         role: 'assistant',
-        content: `Hi ${profileData.full_name || 'there'}! Let's practice English together. You are working on Level ${savedLevel}, Chapter ${savedChapter}. Tell me about yourself, or answer this: How are you today?`,
+        content: `Hi ${profileData.full_name || 'there'}! Let's practice English together. You are working on Level ${profileData.current_level}, Chapter ${profileData.current_chapter}. How are you today?`,
       }
-
-      setMessages([welcomeMessage])
 
       const { data: sessionData, error: sessionError } = await supabase
         .schema('esl_tutor')
         .from('sessions')
         .insert({
           user_id: user.id,
-          level: savedLevel,
-          chapter: savedChapter,
+          level: profileData.current_level,
+          chapter: profileData.current_chapter,
           status: 'active',
         })
         .select()
         .single()
 
       if (sessionError || !sessionData) {
-        setStatus(`Session error: ${sessionError?.message || 'Could not create session'}`)
+        setStatus(`Session error: ${sessionError?.message || 'Could not create session.'}`)
         return
       }
 
@@ -93,6 +88,7 @@ export default function Practice() {
           content: welcomeMessage.content,
         })
 
+      setMessages([welcomeMessage])
       setStatus('')
     }
 
@@ -103,8 +99,8 @@ export default function Practice() {
     if (!input.trim() || loading || !sessionId) return
 
     const messageToSend = input.trim()
-
     const userMessage = { role: 'user', content: messageToSend }
+
     setMessages((prev) => [...prev, userMessage])
     setInput('')
     setLoading(true)
@@ -198,7 +194,7 @@ export default function Practice() {
         }}
       >
         {messages.length === 0 ? (
-          <p>Loading conversation...</p>
+          <p>No conversation started yet.</p>
         ) : (
           messages.map((m, i) => (
             <div key={i} style={{ marginBottom: 12 }}>

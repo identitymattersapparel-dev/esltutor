@@ -54,9 +54,14 @@ export default function Dashboard() {
   const handleSave = async () => {
     if (!user) return
 
+    if (!level || !chapter) {
+      setSaveStatus('Please select both a level and a chapter.')
+      return
+    }
+
     setSaveStatus('Saving...')
 
-    const { error } = await supabase
+    const { error: updateError } = await supabase
       .schema('esl_tutor')
       .from('profiles')
       .update({
@@ -66,12 +71,26 @@ export default function Dashboard() {
       })
       .eq('id', user.id)
 
-    if (error) {
-      setSaveStatus(`Error: ${error.message}`)
+    if (updateError) {
+      setSaveStatus(`Error: ${updateError.message}`)
       return
     }
 
-    await loadProfile(user.id)
+    const refreshedProfile = await loadProfile(user.id)
+
+    if (!refreshedProfile) {
+      setSaveStatus('Error: profile could not be reloaded after save.')
+      return
+    }
+
+    if (
+      refreshedProfile.current_level !== level ||
+      refreshedProfile.current_chapter !== chapter
+    ) {
+      setSaveStatus('Error: save did not persist to the database.')
+      return
+    }
+
     setSaveStatus('Saved successfully.')
   }
 
