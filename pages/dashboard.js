@@ -107,8 +107,17 @@ export default function Dashboard() {
     router.push('/login')
   }
 
+  const handleStartNew = () => {
+    router.push('/practice?mode=new')
+  }
+
+  const handleContinue = () => {
+    if (!profile?.last_session_id) return
+    router.push('/practice?mode=continue')
+  }
+
   return (
-    <div style={{ maxWidth: 600, margin: '100px auto', textAlign: 'center' }}>
+    <div style={{ maxWidth: 700, margin: '100px auto', textAlign: 'center' }}>
       <h1>Dashboard</h1>
 
       {status && <p>{status}</p>}
@@ -163,13 +172,21 @@ export default function Dashboard() {
               </select>
             </div>
 
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
               <button onClick={handleSave} style={{ padding: '10px 20px' }}>
                 Save Progress
               </button>
 
-              <button onClick={() => router.push('/practice')} style={{ padding: '10px 20px' }}>
-                Start Practice
+              <button onClick={handleStartNew} style={{ padding: '10px 20px' }}>
+                Start New Practice
+              </button>
+
+              <button
+                onClick={handleContinue}
+                disabled={!profile.last_session_id}
+                style={{ padding: '10px 20px' }}
+              >
+                Continue Last Session
               </button>
 
               <button onClick={handleLogout} style={{ padding: '10px 20px' }}>

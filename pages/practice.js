@@ -14,7 +14,11 @@ export default function Practice() {
   const [sessionId, setSessionId] = useState(null)
 
   useEffect(() => {
+    if (!router.isReady) return
+
     const init = async () => {
+      const mode = router.query.mode || 'new'
+
       const {
         data: { user },
         error: userError,
@@ -43,6 +47,25 @@ export default function Practice() {
 
       if (!profileData.current_level || !profileData.current_chapter) {
         setStatus('Please go back to the dashboard and save both a level and chapter before starting practice.')
+        return
+      }
+
+      if (mode === 'continue' && profileData.last_session_id) {
+        const { data: existingMessages, error: messagesError } = await supabase
+          .schema('esl_tutor')
+          .from('messages')
+          .select('*')
+          .eq('session_id', profileData.last_session_id)
+          .order('created_at', { ascending: true })
+
+        if (messagesError) {
+          setStatus(`Messages error: ${messagesError.message}`)
+          return
+        }
+
+        setSessionId(profileData.last_session_id)
+        setMessages(existingMessages || [])
+        setStatus('')
         return
       }
 
@@ -93,7 +116,7 @@ export default function Practice() {
     }
 
     init()
-  }, [router])
+  }, [router.isReady, router.query.mode, router])
 
   const sendMessage = async () => {
     if (!input.trim() || loading || !sessionId) return
@@ -197,7 +220,7 @@ export default function Practice() {
           <p>No conversation started yet.</p>
         ) : (
           messages.map((m, i) => (
-            <div key={i} style={{ marginBottom: 12 }}>
+            <div key={m.id || i} style={{ marginBottom: 12 }}>
               <strong>{m.role === 'user' ? 'You' : 'Tutor'}:</strong> {m.content}
             </div>
           ))
@@ -223,4 +246,4 @@ export default function Practice() {
       </div>
     </div>
   )
-} 
+}
