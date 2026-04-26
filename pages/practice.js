@@ -3,6 +3,29 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { supabase } from '../lib/supabaseClient'
 
+function getWelcomeMessage(profileData) {
+  const name = profileData.full_name || 'there'
+  const level = profileData.current_level
+
+  if (level === '1') {
+    return `Hi ${name}! Hello! I am your English tutor. I am fine. How are you?`
+  }
+
+  if (level === '2') {
+    return `Hi ${name}! Let's practice English. I am happy to talk with you. How are you today?`
+  }
+
+  if (level === '3') {
+    return `Hi ${name}! Let's practice English conversation. How are you today? Tell me a little about your day.`
+  }
+
+  if (level === '4') {
+    return `Hi ${name}! Welcome back. Let's start our English conversation practice. How are you today?`
+  }
+
+  return `Hi ${name}! How are you today?`
+}
+
 export default function Practice() {
   const router = useRouter()
   const [user, setUser] = useState(null)
@@ -71,7 +94,7 @@ export default function Practice() {
 
       const welcomeMessage = {
         role: 'assistant',
-        content: `Hi ${profileData.full_name || 'there'}! Let's practice English together. You are working on Level ${profileData.current_level}, Chapter ${profileData.current_chapter}. How are you today?`,
+        content: getWelcomeMessage(profileData),
       }
 
       const { data: sessionData, error: sessionError } = await supabase
