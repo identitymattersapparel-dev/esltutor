@@ -117,94 +117,103 @@ export default function Dashboard() {
   }
 
   return (
-    <div style={{ maxWidth: 700, margin: '100px auto', textAlign: 'center' }}>
-      <h1>Dashboard</h1>
-
-      {status && <p>{status}</p>}
-
-      {user && (
-        <div style={{ marginBottom: 24 }}>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>User ID:</strong> {user.id}</p>
-        </div>
-      )}
-
-      {profile && (
-        <div>
-          <p><strong>Full Name:</strong> {profile.full_name || '(blank)'}</p>
-
-          <div style={{ marginTop: 24 }}>
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', marginBottom: 6 }}>Level</label>
-              <select
-                value={level}
-                onChange={(e) => setLevel(e.target.value)}
-                style={{ width: 250, padding: 8 }}
-              >
-                <option value="">Select level</option>
-                <option value="1">Level 1</option>
-                <option value="2">Level 2</option>
-                <option value="3">Level 3</option>
-                <option value="4">Level 4</option>
-              </select>
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ display: 'block', marginBottom: 6 }}>Chapter</label>
-              <select
-                value={chapter}
-                onChange={(e) => setChapter(e.target.value)}
-                style={{ width: 250, padding: 8 }}
-              >
-                <option value="">Select chapter</option>
-                <option value="1">Chapter 1</option>
-                <option value="2">Chapter 2</option>
-                <option value="3">Chapter 3</option>
-                <option value="4">Chapter 4</option>
-                <option value="5">Chapter 5</option>
-                <option value="6">Chapter 6</option>
-                <option value="7">Chapter 7</option>
-                <option value="8">Chapter 8</option>
-                <option value="9">Chapter 9</option>
-                <option value="10">Chapter 10</option>
-                <option value="11">Chapter 11</option>
-                <option value="12">Chapter 12</option>
-              </select>
-            </div>
-
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
-              <button onClick={handleSave} style={{ padding: '10px 20px' }}>
-                Save Progress
-              </button>
-
-              <button onClick={handleStartNew} style={{ padding: '10px 20px' }}>
-                Start New Practice
-              </button>
-
-              <button
-                onClick={handleContinue}
-                disabled={!profile.last_session_id}
-                style={{ padding: '10px 20px' }}
-              >
-                Continue Last Session
-              </button>
-
-              <button onClick={handleLogout} style={{ padding: '10px 20px' }}>
-                Logout
-              </button>
-            </div>
-
-            {saveStatus && <p style={{ marginTop: 12 }}>{saveStatus}</p>}
-            {logoutStatus && <p style={{ marginTop: 12 }}>{logoutStatus}</p>}
+    <div className="page">
+      <div className="container">
+        <div className="topbar">
+          <div>
+            <div className="badge">Student Dashboard</div>
+            <h1>Welcome back{profile?.full_name ? `, ${profile.full_name}` : ''}</h1>
           </div>
-
-          <div style={{ marginTop: 24 }}>
-            <p><strong>Current Level:</strong> {profile.current_level || '(not set)'}</p>
-            <p><strong>Current Chapter:</strong> {profile.current_chapter || '(not set)'}</p>
-            <p><strong>Last Session ID:</strong> {profile.last_session_id || '(none)'}</p>
-          </div>
+          <button className="button button-secondary" onClick={handleLogout}>
+            Logout
+          </button>
         </div>
-      )}
+
+        {status && <p className="status">{status}</p>}
+
+        {user && profile && (
+          <div className="grid grid-2">
+            <div className="card">
+              <h2 className="section-title">Your Learning Setup</h2>
+
+              <div className="form-group">
+                <label className="label">Level</label>
+                <select
+                  className="select"
+                  value={level}
+                  onChange={(e) => setLevel(e.target.value)}
+                >
+                  <option value="">Select level</option>
+                  <option value="1">Level 1</option>
+                  <option value="2">Level 2</option>
+                  <option value="3">Level 3</option>
+                  <option value="4">Level 4</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="label">Chapter</label>
+                <select
+                  className="select"
+                  value={chapter}
+                  onChange={(e) => setChapter(e.target.value)}
+                >
+                  <option value="">Select chapter</option>
+                  <option value="1">Chapter 1</option>
+                  <option value="2">Chapter 2</option>
+                  <option value="3">Chapter 3</option>
+                  <option value="4">Chapter 4</option>
+                  <option value="5">Chapter 5</option>
+                  <option value="6">Chapter 6</option>
+                  <option value="7">Chapter 7</option>
+                  <option value="8">Chapter 8</option>
+                  <option value="9">Chapter 9</option>
+                  <option value="10">Chapter 10</option>
+                  <option value="11">Chapter 11</option>
+                  <option value="12">Chapter 12</option>
+                </select>
+              </div>
+
+              <div className="button-row">
+                <button className="button" onClick={handleSave}>
+                  Save Progress
+                </button>
+                <button className="button" onClick={handleStartNew}>
+                  Start New Practice
+                </button>
+                <button
+                  className="button button-secondary"
+                  onClick={handleContinue}
+                  disabled={!profile.last_session_id}
+                >
+                  Continue Last Session
+                </button>
+              </div>
+
+              {saveStatus && <p className="status">{saveStatus}</p>}
+              {logoutStatus && <p className="status">{logoutStatus}</p>}
+            </div>
+
+            <div className="card">
+              <h2 className="section-title">Current Status</h2>
+              <div className="info-list">
+                <div className="info-item">
+                  <strong>Email:</strong> {user.email}
+                </div>
+                <div className="info-item">
+                  <strong>Current Level:</strong> {profile.current_level || '(not set)'}
+                </div>
+                <div className="info-item">
+                  <strong>Current Chapter:</strong> {profile.current_chapter || '(not set)'}
+                </div>
+                <div className="info-item">
+                  <strong>Last Session ID:</strong> {profile.last_session_id || '(none)'}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

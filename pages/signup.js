@@ -57,48 +57,61 @@ export default function Signup() {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: '100px auto', textAlign: 'center' }}>
-      <h1>Sign Up</h1>
+    <div className="page">
+      <div className="auth-shell">
+        <div className="card">
+          <div className="hero" style={{ marginBottom: 24 }}>
+            <div className="badge">Create Account</div>
+            <h1 style={{ fontSize: 32 }}>Sign Up</h1>
+            <p>Start practicing English with your AI tutor.</p>
+          </div>
 
-      <form onSubmit={handleSignup}>
-        <input
-          placeholder="Full Name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          style={{ width: '100%', padding: 10, marginBottom: 10 }}
-        />
+          <form onSubmit={handleSignup}>
+            <div className="form-group">
+              <label className="label">Full Name</label>
+              <input
+                className="input"
+                placeholder="Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+            </div>
 
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: 10, marginBottom: 10 }}
-          required
-        />
+            <div className="form-group">
+              <label className="label">Email</label>
+              <input
+                className="input"
+                placeholder="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%', padding: 10, marginBottom: 10 }}
-          required
-        />
+            <div className="form-group">
+              <label className="label">Password</label>
+              <input
+                className="input"
+                placeholder="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ width: '100%', padding: 10 }}
-        >
-          {loading ? 'Signing Up...' : 'Sign Up'}
-        </button>
-      </form>
+            <button className="button" type="submit" disabled={loading} style={{ width: '100%' }}>
+              {loading ? 'Signing Up...' : 'Sign Up'}
+            </button>
+          </form>
 
-      <p style={{ marginTop: 16 }}>{status}</p>
-      <p style={{ marginTop: 16 }}>
-        Already have an account? <Link href="/login">Login</Link>
-      </p>
+          <p className="status">{status}</p>
+          <p className="muted" style={{ marginTop: 16 }}>
+            Already have an account? <Link href="/login">Login</Link>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

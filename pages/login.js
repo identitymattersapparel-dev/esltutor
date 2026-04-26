@@ -44,41 +44,51 @@ export default function Login() {
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: '100px auto', textAlign: 'center' }}>
-      <h1>Login</h1>
+    <div className="page">
+      <div className="auth-shell">
+        <div className="card">
+          <div className="hero" style={{ marginBottom: 24 }}>
+            <div className="badge">Welcome Back</div>
+            <h1 style={{ fontSize: 32 }}>Login</h1>
+            <p>Continue your English practice.</p>
+          </div>
 
-      <form onSubmit={handleLogin}>
-        <input
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: 10, marginBottom: 10 }}
-          required
-        />
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label className="label">Email</label>
+              <input
+                className="input"
+                placeholder="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-        <input
-          placeholder="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%', padding: 10, marginBottom: 10 }}
-          required
-        />
+            <div className="form-group">
+              <label className="label">Password</label>
+              <input
+                className="input"
+                placeholder="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ width: '100%', padding: 10 }}
-        >
-          {loading ? 'Signing In...' : 'Login'}
-        </button>
-      </form>
+            <button className="button" type="submit" disabled={loading} style={{ width: '100%' }}>
+              {loading ? 'Signing In...' : 'Login'}
+            </button>
+          </form>
 
-      <p style={{ marginTop: 16 }}>{status}</p>
-      <p style={{ marginTop: 16 }}>
-        Need an account? <Link href="/signup">Sign Up</Link>
-      </p>
+          <p className="status">{status}</p>
+          <p className="muted" style={{ marginTop: 16 }}>
+            Need an account? <Link href="/signup">Sign Up</Link>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

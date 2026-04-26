@@ -26,19 +26,33 @@ export default function Home() {
   }, [])
 
   return (
-    <div style={{ maxWidth: 700, margin: '100px auto', textAlign: 'center' }}>
-      <h1>ESL Tutor POC</h1>
-      <p>Curriculum-aligned conversational practice for ESL students.</p>
+    <div className="page">
+      <div className="container">
+        <div className="card hero">
+          <div className="badge">ESL Tutor POC</div>
+          <h1>Practice English with an AI Tutor</h1>
+          <p>
+            Students can choose their level and chapter, then practice
+            conversational English in a guided way.
+          </p>
 
-      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 24 }}>
-        {!user ? (
-          <>
-            <Link href="/signup">Sign Up</Link>
-            <Link href="/login">Login</Link>
-          </>
-        ) : (
-          <Link href="/dashboard">Go to Dashboard</Link>
-        )}
+          <div className="home-actions">
+            {!user ? (
+              <>
+                <Link className="button" href="/signup">
+                  Sign Up
+                </Link>
+                <Link className="button button-secondary" href="/login">
+                  Login
+                </Link>
+              </>
+            ) : (
+              <Link className="button" href="/dashboard">
+                Go to Dashboard
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

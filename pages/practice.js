@@ -191,58 +191,66 @@ export default function Practice() {
   }
 
   return (
-    <div style={{ maxWidth: 700, margin: '50px auto', padding: '0 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2>Practice Conversation</h2>
-        <Link href="/dashboard">Back to Dashboard</Link>
-      </div>
-
-      {status && <p>{status}</p>}
-
-      {profile && (
-        <div style={{ marginBottom: 20 }}>
-          <p><strong>Student:</strong> {profile.full_name || user?.email}</p>
-          <p><strong>Level:</strong> {profile.current_level || '(not set)'}</p>
-          <p><strong>Chapter:</strong> {profile.current_chapter || '(not set)'}</p>
+    <div className="page">
+      <div className="practice-shell">
+        <div className="topbar">
+          <div>
+            <div className="badge">Conversation Practice</div>
+            <h2>Practice Session</h2>
+          </div>
+          <Link href="/dashboard">Back to Dashboard</Link>
         </div>
-      )}
 
-      <div
-        style={{
-          border: '1px solid #ccc',
-          padding: 16,
-          minHeight: 320,
-          marginBottom: 16,
-          background: '#fff',
-        }}
-      >
-        {messages.length === 0 ? (
-          <p>No conversation started yet.</p>
-        ) : (
-          messages.map((m, i) => (
-            <div key={m.id || i} style={{ marginBottom: 12 }}>
-              <strong>{m.role === 'user' ? 'You' : 'Tutor'}:</strong> {m.content}
+        {status && <p className="status">{status}</p>}
+
+        {profile && (
+          <div className="card" style={{ marginBottom: 20 }}>
+            <div className="info-list">
+              <div className="info-item">
+                <strong>Student:</strong> {profile.full_name || user?.email}
+              </div>
+              <div className="info-item">
+                <strong>Level:</strong> {profile.current_level || '(not set)'}
+              </div>
+              <div className="info-item">
+                <strong>Chapter:</strong> {profile.current_chapter || '(not set)'}
+              </div>
             </div>
-          ))
+          </div>
         )}
-      </div>
 
-      <div style={{ display: 'flex', gap: 10 }}>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          style={{ flex: 1, padding: 10 }}
-          placeholder="Type your message..."
-          disabled={loading || !sessionId}
-        />
-        <button
-          onClick={sendMessage}
-          disabled={loading || !input.trim() || !sessionId}
-          style={{ padding: '10px 20px' }}
-        >
-          {loading ? 'Sending...' : 'Send'}
-        </button>
+        <div className="chat-box">
+          {messages.length === 0 ? (
+            <p className="muted">No conversation started yet.</p>
+          ) : (
+            messages.map((m, i) => (
+              <div
+                key={m.id || i}
+                className={`message ${m.role === 'user' ? 'message-user' : 'message-assistant'}`}
+              >
+                <strong>{m.role === 'user' ? 'You' : 'Tutor'}:</strong> {m.content}
+              </div>
+            ))
+          )}
+        </div>
+
+        <div className="chat-input-row">
+          <input
+            className="input chat-input"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type your message..."
+            disabled={loading || !sessionId}
+          />
+          <button
+            className="button"
+            onClick={sendMessage}
+            disabled={loading || !input.trim() || !sessionId}
+          >
+            {loading ? 'Sending...' : 'Send'}
+          </button>
+        </div>
       </div>
     </div>
   )
